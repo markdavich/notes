@@ -3,7 +3,7 @@ Pluralsight Course by **Vesna Lakovic van Kempen**
 
 ## What Is It?
 > Paying attention to the present moment non-judgmentally  
-> - Jon Kabat-Zinn
+> <div style="margin-left: 250px;" />- Jon Kabat-Zinn
 
 ## Scenario
 - Quick dismissal of concerns
@@ -72,18 +72,19 @@ putting yourself in their shoes. This helps conflict resolution.
 ## Obstacles
 - Environmental distractions
 - Technological distractions
-- Personal/emotional factors
+- Personal factors
 
 Become aware of these obstacles and actively identify them
 
 ### Environmental Distractions
-- Hi paced
-- Remote work
+- Fast-paced work environment cultivates tension and stress
+- Remote teams may have geographic limitations on communication
+- Cultural differences may introduce misunderstandings
 
 ### Technological Distractions
-- Terminology
-- Over reliance on digital communication
-- Missing non-verbal ques
+- May lead to personal disconnection and misunderstandings
+- Technical terminology can introduce barriers for understanding
+- Virtual communication non-verbal ques
 ### Personal/Emotional Factors
 - Lack of training on soft skills
 
