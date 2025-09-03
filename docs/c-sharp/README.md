@@ -40,11 +40,23 @@
     - [Creating Type Namespace Aliases](#creating-type-namespace-aliases)
     - [Using Keywords for Variable Names and Parameters](#using-keywords-for-variable-names-and-parameters)
     - [Exiting Loops Early](#exiting-loops-early)
+  - [Compilation Tips](#compilation-tips)
+    - [C# Preprocessor Directives](#c%23-preprocessor-directives)
+    - [Implementing Conditional Compilation with Preprocessor Directives](#implementing-conditional-compilation-with-preprocessor-directives)
+    - [Conditionally Compiling Code for Different Platforms](#conditionally-compiling-code-for-different-platforms)
+    - [Defining Custom C# Compilation Symbols](#defining-custom-c%23-compilation-symbols)
+    - [Emitting Custom C# Compiler Warnings and Errors](#emitting-custom-c%23-compiler-warnings-and-errors)
+    - [Conditionally Calling a Method Based on Compilation Symbols](#conditionally-calling-a-method-based-on-compilation-symbols)
+    - [Unit Testing Internal Methods](#unit-testing-internal-methods)
+    - [Marking Code as Obsolete](#marking-code-as-obsolete)
+    - [Binary Compatibility and Optional Parameters](#binary-compatibility-and-optional-parameters)
 - [Lessons](#lessons)
   - [C# Tips \& Traps](#%5Bc%23-tips-%26-traps%5D)
 
 
 ## String, Character, and Formatting Tips
+<div style="margin-left: 2em;">
+
 - `string.IsNullOrWhiteSpace` returns **true** if
   - Is null
   - Is Empty
@@ -201,8 +213,11 @@ Array.ForEach(values, (value) => {
 // Value: -1 is Less Than One
 
 ```
+</div>
 
 ## Numbers & Dates
+<div style="margin-left: 2em;">
+
 ### Parsing Strings Into Numbers
 
 #### String to Integer
@@ -319,8 +334,10 @@ List<int> daysList = new() { 1, 2, 3, 4, 5 };
 // Or you can use this:
 days = Enumerable.Range(1, 5).ToList();
 ```
+</div>
 
 ## Data Types and Objects
+<div style="margin-left: 2em;">
 
 ### Using Tuples to Reduce the Amount of Code
 > "Two-ples" or "Tuh-ples"  
@@ -477,7 +494,11 @@ bool isSameReference = object.ReferenceEquals(a, b); // True
 
 ```
 
+</div>
+
 ## Types for Working With Files, Paths, and URIs
+<div style="margin-left: 2em;">
+
 ### Simplifying Path Creation Code and Other Useful Methods
 
 #### System.IO.Path
@@ -602,7 +623,10 @@ public class FileProcessor
 }
 ```
 
+</div>
+
 ## Organizing and Structuring Classes and Code
+<div style="margin-left: 2em;">
 
 ### The Danger of Virtual Method Calls from Constructors
 A derived class may override the virtual method, and break the base initialization  
@@ -695,9 +719,6 @@ public partial class Example
 
 ### Simplifying Code with Local Functions
 
-
-
-
 ```cs
 public class Example
 {
@@ -719,8 +740,60 @@ public class Example
 ```
 
 ### Creating Type Namespace Aliases
+
+When a Type name is used multiple times for different types:
+
+```cs
+// Namespace Aliases
+using UtilExample = Abc.Utils.Example;
+using ImplExample = Abc.Impl.Example;
+
+
+// --------------------------
+namespace Abc.Utils;
+public class Example { }
+// --------------------------
+namespace Abc.Impl;
+public class Example { }
+// --------------------------
+```
+
 ### Using Keywords for Variable Names and Parameters
+
+Prefix keyword with an `@` to use the keyword as a variable name.
+
+```cs
+byte @byte;
+int @int;
+
+```
+
 ### Exiting Loops Early
+
+```cs
+foreach (a in b) 
+{
+    continue; // goes to next a
+    break; // terminates the loop and goes to next statement outside of loop
+}
+
+```
+</div>
+
+## Compilation Tips
+<div style="margin-left: 2em;">
+
+### C# Preprocessor Directives
+### Implementing Conditional Compilation with Preprocessor Directives
+### Conditionally Compiling Code for Different Platforms
+### Defining Custom C# Compilation Symbols
+### Emitting Custom C# Compiler Warnings and Errors
+### Conditionally Calling a Method Based on Compilation Symbols
+### Unit Testing Internal Methods
+### Marking Code as Obsolete
+### Binary Compatibility and Optional Parameters
+</div>
+
 
 [Integral numeric types]:https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/integral-numeric-types
 [Floating-point numeric types]: https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/floating-point-numeric-types
@@ -734,9 +807,9 @@ public class Example
 |     ✅     | [Course Overview]                              | `1:08`  |      `1:08` |
 |     ✅     | [String, Characters, and Formatting Tips]      | `30:02` |   `1:00:00` |
 |     ✅     | [Tips for Working with Numbers and Dates]      | `29:07` |   `1:10:00` |
-|     🔲     | [Data Types and Object Tips]                   | `21:42` |     `50:00` |
-|     🔲     | [Tips for Working with Files, Paths, and URIs] | `29:22` |   `1:00:00` |
-|     🔲     | [Organizing and Structuring Classes and Code]  | `24:10` |          `` |
+|     ✅     | [Data Types and Object Tips]                   | `21:42` |     `50:00` |
+|     ✅     | [Tips for Working with Files, Paths, and URIs] | `29:22` |   `1:00:00` |
+|     ✅     | [Organizing and Structuring Classes and Code]  | `24:10` |     `45:00` |
 |     🔲     | [Compilation Tips]                             | `28:23` |          `` |
 |     🔲     | [Tips for Casting and Conversions]             | `20:39` |          `` |
 |     🔲     | [Runtime Execution Tips]                       | `27:52` |          `` |
