@@ -784,11 +784,114 @@ foreach (a in b)
 <div style="margin-left: 2em;">
 
 ### C# Preprocessor Directives
+
+```cs
+// Symbol Definition
+#define // Define a new symbol
+#undef // Clear a defined symbol
+
+// Conditional
+#if
+#else
+#elif
+#endif
+
+// Compilation Feedback
+#warning
+#error
+
+// Organization
+#region 
+#endregion
+
+#nullable disable
+#nullable enable
+```
+
 ### Implementing Conditional Compilation with Preprocessor Directives
+```cs
+    string a;
+
+#if DEBUG
+    a += "DEBUG";
+#endif
+
+#if RELEASE
+    a += "RELEASE";
+#endif
+```
+
 ### Conditionally Compiling Code for Different Platforms
+`.csproj`
+
+```xml
+<PropertyGroup>
+    <!-- Note that Frameworks is PLURAL -->
+    <TargetFrameworks>net40;netcoreapp2.0</TargetFrameworks>
+</PropertyGroup>
+```
+
+After saving the `.csproj` file, you will see both platforms in the `bin` folder
+
+```cs
+#if NETCOREAPP2_0
+    a += o.GetType().GetTypeInfo().Namespace;
+#elif NET40
+    a += o.GetType().Namespace;
+#else
+    throw NotSupportedException("Only core 2.0 and .NET Framework 4 supported");
+#endif
+```
+
 ### Defining Custom C# Compilation Symbols
+This is a way to simplify pre-processor directive logic. A symbol can be created  
+for a specific platform and referenced in code, this makes it so we don't need to  
+rely solely on `#if PLATFORM_SYMBOL` in the code.
+
+`.csproj`
+```xml
+<PropertyGroup>
+    <DefineConstants>CUSTOM_SYMBOL</DefineConstants>
+</PropertyGroup>
+
+<!-- Define symbol for specific platform -->
+<PropertyGroup Condition="$(TargetFramework.StartsWith('net4'))">
+    <DefineConstants>CUSTOM_SYMBOL</DefineConstants>
+</PropertyGroup>
+```
+
+```cs
+#define CUSTOM_SYMBOL // Top of file if not in .csproj
+
+#if CUSTOM_SYMBOL
+    a += "Custom Action";
+#endif
+```
+
 ### Emitting Custom C# Compiler Warnings and Errors
+This makes it so we can catch errors at compile time, and not worry about breaking  
+the `RELEASE` build in production.
+
+- Don't `throw`
+- Use `#warning` when you need to know
+- Use `#error` when the app won't work
+
+```cs
+#if CUSTOM_SYMBOL
+#else
+    // Don't do this:
+    // throw NotSupportedException("Only core 2.0 and .NET Framework 4 supported");
+
+    // If you just want to know use #warning
+    #warning CUSTOM_SYMBOL NOT Defined
+
+    // If you want to fail the build, use #error
+    #error CUSTOM_SYMBOL NOT Accounted for, you need to fix this!
+#endif
+```
+
 ### Conditionally Calling a Method Based on Compilation Symbols
+⚡ RESUME HERE
 ### Unit Testing Internal Methods
 ### Marking Code as Obsolete
 ### Binary Compatibility and Optional Parameters
@@ -810,7 +913,7 @@ foreach (a in b)
 |     ✅     | [Data Types and Object Tips]                   | `21:42` |     `50:00` |
 |     ✅     | [Tips for Working with Files, Paths, and URIs] | `29:22` |   `1:00:00` |
 |     ✅     | [Organizing and Structuring Classes and Code]  | `24:10` |     `45:00` |
-|     🔲     | [Compilation Tips]                             | `28:23` |          `` |
+|     🔲     | [Compilation Tips]                             | `28:23` |  `00:30:00` |
 |     🔲     | [Tips for Casting and Conversions]             | `20:39` |          `` |
 |     🔲     | [Runtime Execution Tips]                       | `27:52` |          `` |
 |     🔲     | [Bonus Tips]                                   | `34:51` |          `` |
