@@ -50,6 +50,33 @@
     - [Unit Testing Internal Methods](#unit-testing-internal-methods)
     - [Marking Code as Obsolete](#marking-code-as-obsolete)
     - [Binary Compatibility and Optional Parameters](#binary-compatibility-and-optional-parameters)
+  - [Casting and Conversions](#casting-and-conversions)
+    - [Converting Binary Data to ASCII with Base64 Encoding](#converting-binary-data-to-ascii-with-base64-encoding)
+    - [Converting Base Types to Binary with BitConverter](#converting-base-types-to-binary-with-bitconverter)
+    - [Runtime Conversions with Convert.ChangeType](#runtime-conversions-with-convert.changetype)
+    - [Converting Characters to Numeric Values](#converting-characters-to-numeric-values)
+    - [As or Cast?](#as-or-cast%3F)
+  - [Runtime Execution](#runtime-execution)
+    - [Consequences of Exceptions in Static Constructors](#consequences-of-exceptions-in-static-constructors)
+    - [Getting Environment Information in C#](#getting-environment-information-in-c%23)
+    - [Changing the Current Thread's Culture at Runtime](#changing-the-current-thread's-culture-at-runtime)
+    - [Deferring Creation of Resource-intensive Objects until First Use](#deferring-creation-of-resource-intensive-objects-until-first-use)
+    - [Exception Caching with `Lazy<T>`](#exception-caching-with-%60lazy%3Ct%3E%60)
+    - [Creating Delays with Tasks](#creating-delays-with-tasks)
+    - [Launching Arbitrary Programs and Processes](#launching-arbitrary-programs-and-processes)
+    - [Capturing Process Output and Errors](#capturing-process-output-and-errors)
+  - [General Tips](#general-tips)
+    - [Merging IEnumerable Sequences Together](#merging-ienumerable-sequences-together)
+    - [Performing Set-based Operations on IEnumerable Sequences](#performing-set-based-operations-on-ienumerable-sequences)
+    - [The Caller Information Attributes](#the-caller-information-attributes)
+      - [\[CallerMemberName\]](#%5Bcallermembername%5D)
+      - [\[CallerFilePath\] \& \[CallerLineNumber\]](#%5Bcallerfilepath%5D-%26-%5Bcallerlinenumber%5D)
+    - [Non Short-circuiting Logical Operators in C#](#non-short-circuiting-logical-operators-in-c%23)
+      - [Quick Example](#quick-example)
+      - [Long Example](#long-example)
+    - [Preserving Your Stack Trace When Re-throwing Exceptions](#preserving-your-stack-trace-when-re-throwing-exceptions)
+    - [The Null-coalescing and Null-conditional C# Operators](#the-null-coalescing-and-null-conditional-c%23-operators)
+    - [Summary and Further Learning](#summary-and-further-learning)
 - [Lessons](#lessons)
   - [C# Tips \& Traps](#%5Bc%23-tips-%26-traps%5D)
 
@@ -892,10 +919,508 @@ the `RELEASE` build in production.
 
 ### Conditionally Calling a Method Based on Compilation Symbols
 ⚡ RESUME HERE
+
+```cs
+using System.Diagnostics;
+
+Method(); // Will only get called if in "DEBUG"
+
+[Conditional("DEBUG")] // Only get's compiled into assembly if "DEBUG"
+public void Method() { }
+```
+
 ### Unit Testing Internal Methods
+```cs
+// SomeClass.cs
+[assembly: InternalsVisibleTo("Def.Tests")]
+
+namespace Abc.Utils;
+
+internal void Method() { }
+
+// SomeTests.cs
+namespace Def.Tests;
+
+[Fact]
+public void TestTheInternalMethod()
+{
+    Abc.Utils.Method();
+}
+
+```
 ### Marking Code as Obsolete
+```cs
+// Show a compiler warning
+[Obsolete("This method will be removed next release")]
+public void Method();
+
+// Fail the build (using the second parameter true)
+[Obsolete("This method is no longer available", true)]
+public void Method();
+
+[Obsolete("This class will be removed next release", false)]
+public class Example { }
+```
+
 ### Binary Compatibility and Optional Parameters
+
+If you add an optional parameter to a `Class Library` method, rebuild the  
+`Class Library`, and use the new `.dll` in an existing app (without rebuilding)  
+the app, you will get an error, something like "method not found".  
+
+Don't replace `.dlls`
+
 </div>
+
+## Casting and Conversions
+<div style="margin-left: 2em;">
+
+- Binary to ASCII using Base64 Encoding
+- Converting Base Types to Binary
+- Runtime Type Conversions with `Convert.ChangeType`
+- Converting `Char` to Numeric Character Code
+
+
+### Converting Binary Data to ASCII with Base64 Encoding
+```cs
+private void Convert()
+{
+    // File Bytes to String
+    byte[] bytes File.ReadAllBytes("myFile");
+    string base64String = Convert.ToBase64String(bytes);
+
+    // Base64 String to Bytes
+    byte[] original = Convert.FromBase64String(base64String);
+}
+```
+
+```html
+<!-- src can also hold the literal Base64 Encoded string (after base64,) -->
+<img 
+    id="img" 
+    src="data:image/png;base64,base64String loaded in script" 
+    alt="Image Using Base64 Encoded String" />
+
+<script>
+    const base64Prefix = "data:image/png;base64,"
+    const base64String = "iVBOR ... ErkJggg=="
+    const src = `${base64Prefix}${base64String}`
+
+    document.getElementById("img").src = src
+</script>
+```
+
+### Converting Base Types to Binary with BitConverter
+```cs
+
+- Use `BitConverter.GetBytes(...)` to convert primitive base types to Binary
+- User `DateTime.ToBinary()` to convert dates to binary then use `BitConverter`...
+
+private void Convert()
+{
+    // Int to Binary
+    string s = "32";
+    int i = int.Parse(s);
+    byte[] bytes = BitConverter.GetBytes(i);
+
+    // Date to Binary
+    DateTime dt = DateTime.Now;
+    long dtLong = dt.ToBinary();
+    byte[] dtBytes =  BitConverter.GetBytes(dtLong);
+}
+```
+
+### Runtime Conversions with Convert.ChangeType
+Dynamically change type during runtime
+```cs
+// Setup
+object source = 23;
+object destination;
+Type target;
+
+// Convert by Type
+target = int.GetType();
+destination = Convert.ChangeType(source, target);
+
+// Convert by Type Name
+target = Type.GetType("System.Int32");
+destination = Convert.ChangeType(source, target);
+```
+
+### Converting Characters to Numeric Values
+- Use `char.GetNumericValue(...)` to convert a "Numeric" character to a double
+
+```cs
+char char = '7';
+
+// Get the Character Code
+double code = char.GetNumericValue(char); // This get
+
+```
+
+### As or Cast?
+```cs
+// Casting throws exceptions
+DateTime dt = (DateTime)(Enumerable.Empty<string>());
+
+// "As" only tries, it doesn't throw
+DateTime dt = Enumerable.Empty<string>() as DateTime;
+
+// Both are problematic in this example
+```
+</div>
+
+
+## Runtime Execution
+<div style="margin-left: 2em;">
+
+### Consequences of Exceptions in Static Constructors
+If an exception occurs in a static constructor of a class, the Class Type will  
+not be available for the rest of the Run Time. 
+
+### Getting Environment Information in C#
+|     Environment.Property | Description                                                                                                                                                                                                                  |
+| -----------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|            `CommandLine` | Gets the command line for this process.                                                                                                                                                                                      |
+|               `CpuUsage` | Get the CPU usage, including the process time spent running the application code, the process time spent running the operating system code, and the total time spent running both the application and operating system code. |
+|       `CurrentDirectory` | Gets or sets the fully qualified path of the current working directory.                                                                                                                                                      |
+| `CurrentManagedThreadId` | Gets a unique identifier for the current managed thread.                                                                                                                                                                     |
+|               `ExitCode` | Gets or sets the exit code of the process.                                                                                                                                                                                   |
+|     `HasShutdownStarted` | Gets a value that indicates whether the current application domain is being unloaded or the common language runtime (CLR) is shutting down.                                                                                  |
+| `Is64BitOperatingSystem` | Gets a value that indicates whether the current operating system is a 64-bit operating system.                                                                                                                               |
+|         `Is64BitProcess` | Gets a value that indicates whether the current process is a 64-bit process.                                                                                                                                                 |
+|    `IsPrivilegedProcess` | Gets a value that indicates whether the current process is authorized to perform security-relevant functions.                                                                                                                |
+|            `MachineName` | Gets the NetBIOS name of this local computer.                                                                                                                                                                                |
+|                `NewLine` | Gets the newline string defined for this environment.                                                                                                                                                                        |
+|              `OSVersion` | Gets the current platform identifier and version number.                                                                                                                                                                     |
+|              `ProcessId` | Gets the unique identifier for the current process.                                                                                                                                                                          |
+|         `ProcessorCount` | Gets the number of processors available to the current process.                                                                                                                                                              |
+|            `ProcessPath` | Returns the path of the executable that started the currently executing process. Returns null when the path is not available.                                                                                                |
+|             `StackTrace` | Gets current stack trace information.                                                                                                                                                                                        |
+|        `SystemDirectory` | Gets the fully qualified path of the system directory.                                                                                                                                                                       |
+|         `SystemPageSize` | Gets the number of bytes in the operating system's memory page.                                                                                                                                                              |
+|              `TickCount` | Gets the number of milliseconds elapsed since the system started.                                                                                                                                                            |
+|            `TickCount64` | Gets the number of milliseconds elapsed since the system started.                                                                                                                                                            |
+|         `UserDomainName` | Gets the network domain name associated with the current user.                                                                                                                                                               |
+|        `UserInteractive` | Gets a value indicating whether the current process is running in user interactive mode.                                                                                                                                     |
+|               `UserName` | Gets the user name of the person who is associated with the current thread.                                                                                                                                                  |
+|                `Version` | Gets a version consisting of the major, minor, build, and revision numbers of the common language runtime.                                                                                                                   |
+|             `WorkingSet` | Gets the amount of physical memory mapped to the process context.                                                                                                                                                            |
+
+### Changing the Current Thread's Culture at Runtime
+This would be used if an application had a selectable country/region
+
+```cs
+using System.Globalization;
+using System.Threading;
+
+CultureInfo info = CultureInfo.GetCultureInfo("aa-BB");
+Thread.CurrentThread.CurrentCulture = info;
+```
+
+### Deferring Creation of Resource-intensive Objects until First Use
+```cs
+public class TakesForeverToCreate { }
+
+Lazy<TakesForeverToCreate> thing = new Lazy<TakesForeverToCreate>();
+
+if (true) 
+{
+    string a = thing.Value.Name; // This is where the thing gets instantiated
+}
+```
+
+### Exception Caching with `Lazy<T>`
+`Lazy<T>` is always the same instance, the **Lazy<T>**.`Value` is *Read-Only*  
+
+```cs
+public class T
+{
+    T() { throw new Exception($"ctor Exception at {DateTime.Now.Ticks}"); }
+}
+
+Lazy<T> lazy = new Lazy<T>();
+
+// No exception caching... Different exception instances
+Run(); // ex instance one "ctor Exception at 2346"
+Run(); // ex instance two "ctor Exception at 3264"
+
+// Exception Caching is enabled by using the "function" overload for Lazy
+lazy = new Lazy<T>(() => new T());
+
+// Same exception instance
+Run(); // ex instance one "ctor Exception at 2332"
+Run(); // ex instance one "ctor Exception at 2332"
+
+public void Run()
+{
+    try
+    {
+        lazy.Value.SomeMethod();
+    }
+    catch (Exception ex)
+    {
+
+    }
+}
+```
+
+### Creating Delays with Tasks
+```cs
+private async Task Load()
+{
+    int times;
+
+    WriteLine("Loading...")
+
+    while (times < 10)
+    {
+        await Task.Delay(1000);
+        WriteLine($"Loading {(time + 1)}")
+        times++
+    }
+}
+
+Load(); // Wait 1 second between while operations
+/* Output
+
+    Loading...
+    Loading 1  (1 second later)
+    ...
+    Loading 10 (1 second later)
+
+ */
+```
+
+### Launching Arbitrary Programs and Processes
+- Use the `Process` class to run programs
+```cs
+using System.Diagnostics;
+
+// No parameters
+_ = Process.Start("notepad.exe")
+
+// Single Parameter
+string path = "C:\\temp\\text.txt";
+_ = Process.Start("notepad.exe", path)
+
+// Use ProcessStartInfo
+ProcessStartInfo info = new()
+{
+    FileName = "notepad.exe",
+    Arguments = path,
+    WindowsStyle = ProcessWindowStyle.Maximized
+};
+
+_ = Process.Start(info);
+```
+
+### Capturing Process Output and Errors
+```cs
+using System.Diagnostics;
+
+ProcessStartInfo info = new()
+{
+    FileName = "cmd.exe",
+    Arguments = "/C DATE /T",
+    RedirectStandardOutput = true, // Allows to read cmd output
+    UseShellExecute = false // Allow redirection of output
+};
+
+Process cmd = Process.Start(info);
+
+string out = cmd.StandardOutput.ReadToEnd(); // out = 'Mon 12/23/2023'
+```
+</div>
+
+## General Tips
+<div style="margin-left: 2em;">
+
+### Merging IEnumerable Sequences Together
+```cs
+using System.Linq;
+
+IEnumerable<string> names = new string[] { "Red", "Green", "Blue" };
+IEnumerable<string> values = new string[] { "FF0000", "00FF00", "0000FF" };
+
+// This Zips or Joins two values from IEnumerables using a delagate of
+// (TSource, TToZip)
+IEnumerable<string> joined = names.Zip(
+    values, 
+    (string name, string value) => {
+        return $"{name} (HEX: {value})";
+    }
+)
+```
+
+### Performing Set-based Operations on IEnumerable Sequences
+- Concat
+- Union
+- Intersect
+- Except
+
+```cs
+using System.Linq;
+
+IEnumerable<string> seq1 = new string[] { "Red", "Green", "Blue" };
+IEnumerable<string> seq2 = new string[] { "Red", "Orange", "Yellow" };
+
+IEnumerable<string> concat = seq1.Concat(seq2);
+// Red, Green, Blue, Red, Orange, Yellow (duplicate Red)
+
+IEnumerable<string> union = seq1.Union(seq2);
+// Red, Green, Blue, Orange, Yellow (removes duplicate Red)
+
+IEnumerable<string> intersect = seq1.Intersect(seq2);
+// Red (Returns values that are in both sets)
+
+IEnumerable<string> except = seq1.Except(seq2);
+// Green, Blue (Values in first that don't exist in second)
+```
+
+### The Caller Information Attributes
+
+- `INotifyPropertyChanged` & `[CallerMemberName]` Attribute
+- `CallerFilePath`
+- `CallerLineNumber`
+  
+#### [CallerMemberName]
+```cs
+using System.ComponentModel;
+
+public class Example : INotifyPropertyChanged
+{
+    private string _name;
+
+    // Implements the INotifyPropertyChanged interface
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    public string Name
+    {
+        get => _name;
+        set
+        {
+            _name = value;
+            OnPropertyChangedVerbose(nameof(Name)); // Verbose call
+            OnPropertyChanged(); // Simple Call, no magic strings
+        }
+    }
+
+    protected virtual void OnPropertyChangedVerbose(string propertyName)
+    {
+        PropertyChanged?.Invoke(
+            this, 
+            new PropertyChangedEventArgs(propertyName)
+        );
+    }
+
+    protected virtual void OnPropertyChanged(
+        [CallerMemberName] string propertyName = null
+    )
+    {
+        PropertyChanged?.Invoke(
+            this, 
+            new PropertyChangedEventArgs(propertyName)
+        );
+    }
+}
+```
+
+#### [CallerFilePath] & [CallerLineNumber]
+```cs
+
+// Test.cs
+Example.GetFileName(); // Returns Fully\Qualified\Path\To\Test.cs
+Example.GetLineNo(); // Returns This line number
+
+// Example.cs
+private void GetFileName([CallerFileName] string callingFile = null) => callingFile;
+private void GetLinNo([CallerLineNumber] int callingLineNo = null) => callingLineNo;
+```
+
+### Non Short-circuiting Logical Operators in C#
+- Use single `&` or `|` to stop short-circuiting logical **AND** & **OR**
+
+#### Quick Example
+```cs
+// Using single & or | evaluates both expressions
+bool and = a & b;
+bool or = a | b;
+```
+
+#### Long Example
+```cs
+string a = "A";
+bool isTrue = false;
+
+// Short-Circuiting Logical AND
+bool shortCircuitBool = isTrue && a == "A"; // a == "A" is NOT evaluated
+shortCircuitBool = isTrue && CheckName();   // CheckName() is NOT called
+
+// Non-Short-Circuiting Logical AND using single &
+bool nonShortCircuitBool = isTrue & a == "A" // a == "A" IS evaluated
+nonShortCircuitBool = isTrue & CheckName()   // CheckName() IS called
+
+private bool CheckName() => a == "A";
+```
+
+### Preserving Your Stack Trace When Re-throwing Exceptions
+```cs
+
+private void Method1()
+{
+    try
+    {
+        Method2(); // Line 1
+    }
+    catch (Exception ex)
+    {
+        // Line 1 > Line 23 > Line 46
+    }
+}
+
+private void Method2()
+{
+    try
+    {
+        Method3() // Line 23
+    }
+    catch (Exception) // EXCLUDE the instance variable "ex"
+    {
+        throw; // "throw" ONLY
+    }
+}
+
+private void Method3()
+{
+    throw new Exception("Method 3 exception"); // Line 46
+}
+
+```
+
+### The Null-coalescing and Null-conditional C# Operators
+- Null-Coalescing `??`
+- Null-Conditional `a?.Method() ??`
+
+```cs
+
+string b = a is null ? "A was null" : a;
+
+// Null-Coalescing ??
+string b = a ?? "A was null";
+
+// Null-Conditional 
+```
+
+### Summary and Further Learning
+```cs
+
+```
+
+</div>
+
+
+
 
 
 [Integral numeric types]:https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/integral-numeric-types
@@ -913,10 +1438,10 @@ the `RELEASE` build in production.
 |     ✅     | [Data Types and Object Tips]                   | `21:42` |     `50:00` |
 |     ✅     | [Tips for Working with Files, Paths, and URIs] | `29:22` |   `1:00:00` |
 |     ✅     | [Organizing and Structuring Classes and Code]  | `24:10` |     `45:00` |
-|     🔲     | [Compilation Tips]                             | `28:23` |  `00:30:00` |
-|     🔲     | [Tips for Casting and Conversions]             | `20:39` |          `` |
-|     🔲     | [Runtime Execution Tips]                       | `27:52` |          `` |
-|     🔲     | [Bonus Tips]                                   | `34:51` |          `` |
+|     ✅     | [Compilation Tips]                             | `28:23` |     `45:00` |
+|     ✅     | [Tips for Casting and Conversions]             | `20:39` |     `45:00` |
+|     ✅     | [Runtime Execution Tips]                       | `27:52` |   `1:00:00` |
+|     🔲     | [Bonus Tips]                                   | `34:51` |   `1:00:00` |
 
 
 [C# Tips & Traps]: https://app.pluralsight.com/ilx/video-courses/10ec35af-2ed3-414e-aba8-8d2a907e2841/ded43235-1576-485f-b01c-152146d70ab8/9624b738-574c-449d-89e3-145829161dcc
