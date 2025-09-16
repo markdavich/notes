@@ -4,5 +4,7 @@
         "OLAP",
         "OLTP",
         "Pluralsight"
-    ]
+    ],
+    "workbench.settings.openDefaultKeybindings": true,
+    "omnisharp.enableLspDriver": true
 }

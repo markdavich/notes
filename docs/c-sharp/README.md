@@ -4,8 +4,8 @@
   - [String, Character, and Formatting Tips](#string%2C-character%2C-and-formatting-tips)
     - [Checking for Valid Unicode Characters](#checking-for-valid-unicode-characters)
     - [Formatting Strings](#formatting-strings)
-      - [Consistent Column Width](#consistent-column-width)
-      - [Positive, Negative, \& Zero Formatting](#positive%2C-negative%2C-%26-zero-formatting)
+      - [Consistent Column Width `{position, padding}`](#consistent-column-width-%60%7Bposition%2C-padding%7D%60)
+      - [Positive, Negative, \& Zero Formatting \`{positive, negative, zero}](#positive%2C-negative%2C-%26-zero-formatting-%60%7Bpositive%2C-negative%2C-zero%7D)
     - [StringBuilder](#stringbuilder)
     - [Custom Format Providers](#custom-format-providers)
   - [Numbers \& Dates](#numbers-%26-dates)
@@ -22,6 +22,7 @@
     - [Creating and Using Combinable Enums (Flags)](#creating-and-using-combinable-enums-(flags))
     - [Improving Struct Equality Performance](#improving-struct-equality-performance)
       - [A.Equals(B)](#a.equals(b))
+      - [Ensure Performance by Overriding `Equals`](#ensure-performance-by-overriding-%60equals%60)
     - [Forcing Reference Equality Comparisons](#forcing-reference-equality-comparisons)
   - [Types for Working With Files, Paths, and URIs](#types-for-working-with-files%2C-paths%2C-and-uris)
     - [Simplifying Path Creation Code and Other Useful Methods](#simplifying-path-creation-code-and-other-useful-methods)
@@ -66,8 +67,12 @@
     - [Launching Arbitrary Programs and Processes](#launching-arbitrary-programs-and-processes)
     - [Capturing Process Output and Errors](#capturing-process-output-and-errors)
   - [General Tips](#general-tips)
-    - [Merging IEnumerable Sequences Together](#merging-ienumerable-sequences-together)
+    - [Merging IEnumerable Sequences Together (`.Zip`)](#merging-ienumerable-sequences-together-(%60.zip%60))
     - [Performing Set-based Operations on IEnumerable Sequences](#performing-set-based-operations-on-ienumerable-sequences)
+      - [Concat](#concat)
+      - [Union](#union)
+      - [Intersect](#intersect)
+      - [Except](#except)
     - [The Caller Information Attributes](#the-caller-information-attributes)
       - [\[CallerMemberName\]](#%5Bcallermembername%5D)
       - [\[CallerFilePath\] \& \[CallerLineNumber\]](#%5Bcallerfilepath%5D-%26-%5Bcallerlinenumber%5D)
@@ -76,13 +81,15 @@
       - [Long Example](#long-example)
     - [Preserving Your Stack Trace When Re-throwing Exceptions](#preserving-your-stack-trace-when-re-throwing-exceptions)
     - [The Null-coalescing and Null-conditional C# Operators](#the-null-coalescing-and-null-conditional-c%23-operators)
-    - [Summary and Further Learning](#summary-and-further-learning)
 - [Lessons](#lessons)
   - [C# Tips \& Traps](#%5Bc%23-tips-%26-traps%5D)
 
 
 ## String, Character, and Formatting Tips
 <div style="margin-left: 2em;">
+
+`IsNullOrWhiteSpace` is just like `IsNullOrEmpty` but it also checks if there is  
+only **Whitespace**, if so it returns `true`... Start using this :)
 
 - `string.IsNullOrWhiteSpace` returns **true** if
   - Is null
@@ -114,7 +121,7 @@ string line = string.Format(
 line = $"First Value: {DateTime.Now} Second Value: {23} Third Value: {"Yellow"}"
 ```
 
-#### Consistent Column Width
+#### Consistent Column Width `{position, padding}`
 Instead of using `PadLeft(...)` or `PadRight(...)` there is a formatting template  
 which takes a `width` argument. The width argument is a integer which represents  
 the total length of a "column", if it is *negative* the column will be aligned to   
@@ -144,7 +151,7 @@ forEach(obj in objects) {
 string line = $"First: {obj.ValOne, -5} Second: {obj.ValTwo, 5}"
 ```
 
-#### Positive, Negative, & Zero Formatting
+#### Positive, Negative, & Zero Formatting `{positive, negative, zero}
 - Three part template separated by `;`
   - Part One — Used when the value is **positive** 
   - Part Two — Used when the value is **negative** 
@@ -267,7 +274,7 @@ string int = int.Parse(value, NumberStyles.Integer);
 local expects dates to be "dd/mm/yyyy" an exception will be thrown if a "mm/dd/yyyy"  
 or other date format is used. *This gets really weird* when values between **1 and 12**  
 are used, since the function can't tell which format is being used. For example,  
-if the local is using `dd/mm/yyyy` and a user passes a `mm/dd/yyyy` value of `5/8/2025`
+if the local is using `dd/mm/yyyy` and a user passes a `mm/dd/yyyy` value of `5/8/2025`  
 the function will return `August, 5th, 2025` instead of what the user expected, which  
 is `May, 8th, 2025`.
 
@@ -304,8 +311,8 @@ Learn about `BigInteger` vs `int`
 
 ### Random Numbers
 
-> Note, `max + 1` is use so the `Next(...)` method will include the max value,  
-> otherwise, `max` will be excluded.
+> Note, the reason `max + 1` is used makes it so teh `Next(...)` method will include  
+> the **maximum** value, otherwise, `max` will be excluded.
 
 Passing a static **seed** value to the `Random` constructor will produce identical  
 results when using `Next()` in succession. Two consecutive instances of `Random` will  
@@ -318,21 +325,26 @@ most likely produce duplicate values.
 ```cs
 
 Random random = new(); // System clock is the seed value
+int min = 23;
+int max = 46;
 int i;
 
-i = random.Next(); // returns non-negative integer
-i = random.Next(max + 1); // returns non-negative less than max
-i = random.Next(min, max + 1); // returns inclusive value between `min` and `max + 1`
+i = random.Next();             // returns non-negative integer
+i = random.Next(max + 1);      // returns non-negative less than or equal to max (0 to 46)
+i = random.Next(min, max + 1); // returns inclusive value between `min` and `max + 1` (23 to 46)
 
 byte[] bytes = random.NextBytes(Byte[] ba); // Creates byte array same size as ba
 float float = random.NextFloat(); // 0.0 >= float < 1.0
 ```
 
 ### Creating Cryptographically Secure Random Numbers
-
+- ⚠️ `RNGCryptoServiceProvider` is Obsolete ⚠️
 ```cs
 using System.Security.Cryptography;
 
+// ☢️ DON'T DO THIS ☢️
+// Random Number Generator (RNG)
+// RandomNumberGenerator now 
 // The provider implements IDisposable so it is wrapped in a using statement
 using (RNGCryptoServiceProvider provider = new())
 {
@@ -351,6 +363,17 @@ using (RNGCryptoServiceProvider provider = new())
 
     Console.WriteLine(result);
 }
+
+
+// ✅ Correct Way
+using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
+{
+    int bytesPerInt = 4;
+    byte[] bytes = new byte[bytesPerInt];
+    rng.GetBytes(bytes); // The array is now filled with cryptographically strong random bytes.
+}
+
+
 ```
 
 ### Generating Sequences of Integer Values
@@ -474,13 +497,14 @@ In `C#` there are two kinds of type, **Reference** and **Value**
 | **Reference** | `class`, `interface`, `delegate`, `record`, `dynamic`, `object`, `string`                                                 |
 | **Value**     | `struct`, `enum`, `bool`, `char`, [Integral numeric types]: `byte`, `int`, `short...`,  [Floating-point numeric types]... |
 
+#### Ensure Performance by Overriding `Equals`
 ```cs
-
 public struct WithRefType
 {
     public int ValueType { get; set; }
     public string ReferenceType { get; set; }
 
+    // Override the Equals method to avoid reflection
     public override bool Equals(object obj) {
         if (!(obj is WithRefType)) {
             return false;
@@ -506,8 +530,6 @@ bool isEqual = A.Equals(B);
 ### Forcing Reference Equality Comparisons
 
 ```cs
-
-
 Uri a = new("url one"); // Memory address 1
 Uri b = new("url one"); // Memory address 2
 
@@ -518,7 +540,6 @@ bool isSameReference = object.ReferenceEquals(a, b); // False
 a = b;
 
 bool isSameReference = object.ReferenceEquals(a, b); // True
-
 ```
 
 </div>
@@ -561,8 +582,6 @@ string directory = "";
 string file = "";
 
 string path = Path.Combine(drive, directory, file);
-
-
 ```
 
 ### Working with URIs
@@ -662,7 +681,6 @@ flow.
 ### Simplifying Constructor Overloads (Constructor Chaining)
 
 ```cs
-
 public class Example
 {
     // This is constructor chaining
@@ -675,7 +693,6 @@ public class Example
 
     }
 }
-
 ```
 
 ### Creating Methods that Take an Arbitrary Number of Arguments
@@ -792,7 +809,6 @@ Prefix keyword with an `@` to use the keyword as a variable name.
 ```cs
 byte @byte;
 int @int;
-
 ```
 
 ### Exiting Loops Early
@@ -803,7 +819,6 @@ foreach (a in b)
     continue; // goes to next a
     break; // terminates the loop and goes to next statement outside of loop
 }
-
 ```
 </div>
 
@@ -946,8 +961,8 @@ public void TestTheInternalMethod()
 {
     Abc.Utils.Method();
 }
-
 ```
+
 ### Marking Code as Obsolete
 ```cs
 // Show a compiler warning
@@ -1166,6 +1181,7 @@ public void Run()
 ```
 
 ### Creating Delays with Tasks
+
 ```cs
 private async Task Load()
 {
@@ -1193,7 +1209,9 @@ Load(); // Wait 1 second between while operations
 ```
 
 ### Launching Arbitrary Programs and Processes
+
 - Use the `Process` class to run programs
+  
 ```cs
 using System.Diagnostics;
 
@@ -1216,6 +1234,7 @@ _ = Process.Start(info);
 ```
 
 ### Capturing Process Output and Errors
+
 ```cs
 using System.Diagnostics;
 
@@ -1236,7 +1255,8 @@ string out = cmd.StandardOutput.ReadToEnd(); // out = 'Mon 12/23/2023'
 ## General Tips
 <div style="margin-left: 2em;">
 
-### Merging IEnumerable Sequences Together
+### Merging IEnumerable Sequences Together (`.Zip`)
+
 ```cs
 using System.Linq;
 
@@ -1254,10 +1274,10 @@ IEnumerable<string> joined = names.Zip(
 ```
 
 ### Performing Set-based Operations on IEnumerable Sequences
-- Concat
-- Union
-- Intersect
-- Except
+#### Concat
+#### Union
+#### Intersect
+#### Except
 
 ```cs
 using System.Linq;
@@ -1285,6 +1305,7 @@ IEnumerable<string> except = seq1.Except(seq2);
 - `CallerLineNumber`
   
 #### [CallerMemberName]
+
 ```cs
 using System.ComponentModel;
 
@@ -1327,8 +1348,8 @@ public class Example : INotifyPropertyChanged
 ```
 
 #### [CallerFilePath] & [CallerLineNumber]
-```cs
 
+```cs
 // Test.cs
 Example.GetFileName(); // Returns Fully\Qualified\Path\To\Test.cs
 Example.GetLineNo(); // Returns This line number
@@ -1349,6 +1370,7 @@ bool or = a | b;
 ```
 
 #### Long Example
+
 ```cs
 string a = "A";
 bool isTrue = false;
@@ -1365,8 +1387,8 @@ private bool CheckName() => a == "A";
 ```
 
 ### Preserving Your Stack Trace When Re-throwing Exceptions
-```cs
 
+```cs
 private void Method1()
 {
     try
@@ -1403,25 +1425,53 @@ private void Method3()
 - Null-Conditional `a?.Method() ??`
 
 ```cs
+// Old Way:
+//  if a is null return "a is null"
+//  otherwise, return a
+string b = a is null ? "a is null" : a;
 
-string b = a is null ? "A was null" : a;
+// ╭──────────────────────────╮
+// │ New Way: Null-Coalescing │
+// ╰──────────────────────────╯
+//  Same as above using Null-Coalescing ??
+//  Return a if it is not null (??)
+//  otherwise return "a is null"
+string b = a ?? "a is null";
 
-// Null-Coalescing ??
-string b = a ?? "A was null";
+// ╭────────────────────────────────────╮
+// │ Chaining Null-Coalescing Operators │
+// ╰────────────────────────────────────╯
+int? a = null;
+int? b = null;
+int c = 23;
 
-// Null-Conditional 
-```
+// If a is null return b
+// If b is null return c
+int result = a ?? b ?? c;
 
-### Summary and Further Learning
-```cs
+// ╭───────────────────────────╮
+// │ Null-Conditional Operator │
+// ╰───────────────────────────╯
+string a = null;
+string b;
 
+// Old Way:
+if (a is null) {
+    b = "a is null, no UPPER value";
+}
+else
+{
+    b = a.ToUpperInvariant();
+}
+
+// New Way:
+//  a? checks if a is null, if it is not, .ToUpperInvariant() will be called
+//  and returned, otherwise a?.ToUpperInvariant() will evaluate to null, causing
+//  the the returned value to be the "string"
+b = a?.ToUpperInvariant() ?? "a is null, no UPPER value";
 ```
 
 </div>
-
-
-
-
 
 [Integral numeric types]:https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/integral-numeric-types
 [Floating-point numeric types]: https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/floating-point-numeric-types
@@ -1441,7 +1491,7 @@ string b = a ?? "A was null";
 |     ✅     | [Compilation Tips]                             | `28:23` |     `45:00` |
 |     ✅     | [Tips for Casting and Conversions]             | `20:39` |     `45:00` |
 |     ✅     | [Runtime Execution Tips]                       | `27:52` |   `1:00:00` |
-|     🔲     | [Bonus Tips]                                   | `34:51` |   `1:00:00` |
+|     ✅     | [Bonus Tips]                                   | `34:51` |   `1:00:00` |
 
 
 [C# Tips & Traps]: https://app.pluralsight.com/ilx/video-courses/10ec35af-2ed3-414e-aba8-8d2a907e2841/ded43235-1576-485f-b01c-152146d70ab8/9624b738-574c-449d-89e3-145829161dcc
