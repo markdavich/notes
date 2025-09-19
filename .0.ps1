@@ -1,18 +1,8 @@
-$baseKey = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search\PreventIndexingCertainPaths"
 
-New-Item -Path $baseKey -Force | Out-Null
+# Lindsay, change the path below to the real ijos.exe path
+$ijosPath = "C:\Path\To\YourApp.exe"
 
-$patterns = @(
-    "file:///*\.git\*",
-    "file:///*\node_modules\*",
-    "file:///*\bin\*",
-    "file:///*\obj\*",
-    "file:///*\.vs\*",
-    "file:///*\packages\*"
-)
-
-foreach ($pattern in $patterns) {
-    New-ItemProperty -Path $baseKey -Name $pattern -Value $pattern -PropertyType String -Force
-}
-
-Write-Host "Wildcard exclusions added to registry."
+Add-Type -AssemblyName System.Reflection
+$assembly = [System.Reflection.Assembly]::LoadFile($ijosPath)
+$debugAttr = $assembly.GetCustomAttributes($false) | Where-Object { $_.GetType().FullName -eq "System.Diagnostics.DebuggableAttribute" }
+$debugAttr | Format-List *
