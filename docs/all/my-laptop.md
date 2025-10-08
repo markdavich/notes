@@ -34,7 +34,7 @@ Write-Host "|**BIOS Version**| ``$($bios.SMBIOSBIOSVersion)``|"
 ## Docking Station
 |                            |                                 |
 | -------------------------: | :------------------------------ |
-|           **Product Name** | `Dell Thunderbolt Dock WD22TB4` |
+|           **Product Name** | [Dell Thunderbolt Dock WD22TB4] |
 |          **Model Numbers** | `WD22TB4, K20A`                 |
 |  **Service Tag (SVC TAG)** | `HXMVKT3UK`                     |
 |   **Express Service Code** | `39039108375`                   |
@@ -42,3 +42,6 @@ Write-Host "|**BIOS Version**| ``$($bios.SMBIOSBIOSVersion)``|"
 |            **MAC Address** | `AC-1A-3D-61-3F-63`             |
 |            **Input Power** | `19.5V, 9.23A`                  |
 | **Manufacturing Location** | `Made in Vietnam`               |
+
+
+[Dell Thunderbolt Dock WD22TB4]: https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=w5jt8
