@@ -1,0 +1,49 @@
+=====================================
+Department of Health and Welfare
+-------------------------------------
+Application Upgrade Notes
+
+Attendees
+    - Andrew Donndelinger CO 8th (Central Offices 8th Floor [7th really]
+    - Mark Davich
+=====================================
+
+EMS is going to military
+5 apps in-house and COTS
+- Contractor 20 yrs ago built in-house using generators which
+  build web page from database
+  - EMS Attachments gets documents from IWISE (Decommissioned 7 yrs ago)
+  - 
+
+- ABC PDF for fillable forms
+- App SEC all apps need to go through intrusion vetting software
+
+DHW is migrating On-Prem DevOps to hosted DevOps
+
+DHW is broken into divisions
+- Financial Services
+- Welfare
+- Medicaid
+- Etc...
+
+They went from TFS to Git repos
+
+They have pipelines set up for
+- DEVL goes directly to publish and then goes to QUAL if passes
+- Developers only branch off DEVL except for Hotfix
+- They use configurations which match
+- Connections strings replaced by GMSA
+- They have a standard README
+
+? What server version is migrations
+
+DevExpress - for tables and some components (Developer licenses)
+Crystal Reports - 
+from DAL Gen process
+
+Central Office 8th floor (he is on the 7th floor)
+
+We need licenses for
+    - ABC PDF
+    - DevExpress
+

@@ -152,3 +152,20 @@ WHERE
 
 </div>
 </div>
+
+**NOTE** Takes Long Time  
+![alt text](image-1.png)  
+![alt text](image.png)  
+
+We need to chat with Mike Davidson in Teams
+
+Ready to be Processed --> Already Processed
+
+**Ready to be Processed** Batch Reports  
+- Process All and Download CSV Export (Button)  
+![alt text](image-2.png)
+
+- What happens between RtbP (button) and AP (button)
+
+**Weird Dates**  
+![alt text](image-3.png)
