@@ -17,3 +17,17 @@ Phil from BSU
 #### Cursor Instructions
 - `cursor\rules\project-settings.mdc`
 - Anthropic MPC tools
+
+### Monday, November 24nd 2025
+#### MCP Eric Neely
+> |                                  |           |
+> | -------------------------------: | :-------- |
+> |         `Model Context Protocol` | (**MCP**) |
+> | `Retrieval-Augmented Generation` | (**RAG**) |
+
+- Temperature?
+- Laura (Training)
+- QLaura (Training)
+- Multiple vector stores?
+
+

@@ -1,0 +1,87 @@
+{
+    "ColumnGuides": {
+        "Default": {
+            "Lines": [
+                {
+                    "Column": 80,
+                    "Color": "ff0000ff",
+                    "Style": "dotted",
+                    "Opacity": "Should this go here or be included in Color?",
+                    "isVisible": "defaults to true if not specified"
+                },
+                {
+                    "Column": 85,
+                    "Color": "red",
+                    "Style": "solid",
+                    "Opacity": "Should this go here or be included in Color?",
+                    "isVisible": "defaults to true if not specified"
+                }
+            ],
+            "Fills": [
+                {
+                    "Style": "dotted",
+                    "Start": {
+                        "Column": 80,
+                        "Color": "00ff00ff",
+                        "Opacity": 0.1
+                    },
+                    "End": {
+                        "Column": 85,
+                        "Color": "00ff00ff",
+                        "Opacity": 0.5
+                    }
+                }
+            ]
+        },
+        "LanguageSpecific": {
+            ".ts": {
+                "Lines": [
+                    {
+                        "Column": 120,
+                        "Color": "0000ffff",
+                        "Style": "dashed",
+                        "Opacity": "Should this go here or be included in Color?"
+                    }
+                ]
+            },
+            "Kotlin": {
+                "Lines": [
+                    {
+                        "Column": 100,
+                        "Color": "0000ffff",
+                        "Style": "dashed",
+                        "Opacity": "Should this go here or be included in Color?"
+                    }
+                ],
+            "Fills": [
+                {
+                    "Description": "Gradient fill. Gradient is from left to right",
+                    "Style": "solid",
+                    "Start": {
+                        "Column": 80,
+                        "Color": "00ff00ff",
+                        "Opacity": 0.1
+                    },
+                    "End": {
+                        "Column": 85,
+                        "Color": "00ff00ff",
+                        "Opacity": 0.5
+                    }
+                },
+                {
+                    "Description": "Simple Fill. Width is in characters",
+                    "Style": "hatched",
+                    "Column": 46,
+                    "Color": "salmon",
+                    "Opacity": 0.32,
+                    "Width": 25
+                }
+            ]
+            }
+        },
+        "Exclusions": [
+            "By Language or Extension?",
+            "...Or both?"
+        ]
+    }
+}
