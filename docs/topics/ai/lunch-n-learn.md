@@ -29,5 +29,6 @@ Phil from BSU
 - Laura (Training)
 - QLaura (Training)
 - Multiple vector stores?
+- Few Shot ?
 
 
