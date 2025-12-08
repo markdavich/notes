@@ -39,14 +39,25 @@
 ```sh
 podman pull --tls-verify=false mcr.microsoft.com/mssql/server:2022-latest
 
-docker run `
+podman run `
     -e "ACCEPT_EULA=Y" `
-    -e "MSSQL_SA_PASSWORD=your password here" `
+    -e "MSSQL_SA_PASSWORD=your password here (1 Capital, 1 Lowercase, 1 Special, 1 Number, At least 8 characters)" `
     -p 1433:1433 `
-    --name ci.irs `
-    --hostname ci.irs `
+    --name ci-irs `
+    --hostname ci-irs `
+    -d mcr.microsoft.com/mssql/server:2022-latest
+
+
+podman run `
+    -e "ACCEPT_EULA=Y" `
+    -e "MSSQL_SA_PASSWORD=P@ssword1" `
+    -p 1433:1433 `
+    --name ci-irs-db `
+    --hostname ci-irs-db `
     -d mcr.microsoft.com/mssql/server:2022-latest
 ```
+
+<!-- Password = "P@ssword1" -->
 
 start both things machine and sql image
 
@@ -54,10 +65,18 @@ copy a .bak to c:\.wsl\irs.bak
 
 ```sh
 podman machine ssh
-podman cp /mnt/c/.wsl/irs.bak ci.irs:opt
+podman cp /mnt/c/.wsl/irs.bak ci-irs-db:opt
 ```
+this copies the .bak to the root ("/")
+:opt = /opt
+
+Restore Database
+![alt text](image.png)
 
 Step **5** Concludes the Installation of Podman
+
+
+
 
 
 [Podman for Windows]: https://github.com/containers/podman/blob/main/docs/tutorials/podman-for-windows.md
