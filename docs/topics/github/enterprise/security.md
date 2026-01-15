@@ -17,7 +17,9 @@
 > blew up, it caused some problems, hence the need for Globomantics to tighten up the  
 > repos. What is a vulnerability? It's a flaw or weakness that can be exploited, and  
 > we're talking software or hardware, exploited by a malicious actor to compromise  
-> the security or stability of a system or application, hardware, firmware, software.
+> the security or stability of a system or application, hardware, firmware, software.  
+>
+> <span style="float: right;">— [Tim Warner]</span><br />
 
 **🏵️ Module 1**
 
@@ -119,8 +121,6 @@ and more...
 **Module 3**
 ## 🏵️ Understanding and Using GitHub Advanced Security
 
-
-
 **Module 4**
 ## 🏵️ Preparing and Hardening Repositories Using GitHub Advanced Security
 
@@ -135,3 +135,8 @@ and more...
 ---
 
 ## ✨ Recognize the Risks of Software Supply Chain Attacks
+
+
+
+<!-- Links -->
+[Tim Warner]: https://app.pluralsight.com/profile/author/tim-warner
