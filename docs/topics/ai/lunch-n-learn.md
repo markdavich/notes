@@ -8,6 +8,7 @@
 - Attractor
 - Orchestrator
 
+- ? Superpowers Repository (Claude) ?
 - ? Swarm (Output from the gui) ?
 - ? Claude has ui tools now ?
 
