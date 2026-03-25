@@ -282,15 +282,15 @@ would be:
 [🔝]: #overview
 
 <!-- Glossary Links -->
-[DDL]: ../glossary/README.md#ddl--data-modeling-
-[OLTP]: ../glossary/README.md#oltp--data-modeling-
-[OLAP]: ../glossary/README.md#olap--data-modeling-
-[DSS]: ../glossary/README.md#dss--data-modeling-
-[DDM]: ../glossary/README.md#ddm--data-modeling-
-[JSON]: ../glossary/README.md#json
-[Reference Domain]: ../glossary/#reference-domain--data-modeling-
-[Domain]: ../glossary/#domain--data-modeling-
-[Foreign Key]: ../glossary/#foreign-key--data-modeling-
+[DDL]: ./../glossary/README.md#ddl--data-modeling-
+[OLTP]: ./../glossary/README.md#oltp--data-modeling-
+[OLAP]: ./../glossary/README.md#olap--data-modeling-
+[DSS]: ./../glossary/README.md#dss--data-modeling-
+[DDM]: ./../glossary/README.md#ddm--data-modeling-
+[JSON]: ./../glossary/README.md#json
+[Reference Domain]: ./../glossary#reference-domain--data-modeling-
+[Domain]: ./../glossary#domain--data-modeling-
+[Foreign Key]: ./../glossary#foreign-key--data-modeling-
 
 
 []: ../glossary/#--data-modeling-
