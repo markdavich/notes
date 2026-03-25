@@ -1,0 +1,2 @@
+- Sandcastles not monuments
+- Better to be lead than dragged
